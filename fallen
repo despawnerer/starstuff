@@ -4,10 +4,6 @@ import sys
 
 from gi.repository import GObject
 from gi.repository import Gtk
-"""
-import cluttergtk
-import clutter
-"""
 
 from Fallen.connections import Connections
 from Fallen.player import Player
@@ -50,14 +46,6 @@ def handle_playtime(player, time):
 pl.connect('status-changed', handle_status)
 pl.connect('track-changed', handle_track)
 pl.connect('playtime', handle_playtime)
-
-"""
-embed = cluttergtk.Embed()
-stage = embed.get_stage()
-
-box = builder.get_object('main-box')
-box.pack_end(embed)
-"""
 
 window = builder.get_object('main-window')
 
