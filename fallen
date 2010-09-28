@@ -17,6 +17,9 @@ cs.bring_up()
 builder = Gtk.Builder()
 builder.add_from_file('Fallen/ui/main.ui')
 
+# Handle the UI
+
+window = builder.get_object('main-window')
 tracklabel = builder.get_object('track-name')
 playtime = builder.get_object('playtime')
 play = builder.get_object('play')
@@ -26,6 +29,14 @@ def handle_play_activate(play):
     pl.play() if play.get_active() else pl.pause()
 
 play.connect('activate', handle_play_activate)
+
+def handle_window_destroy(window):
+    loop.quit()
+
+window.connect('destroy', handle_window_destroy)
+window.show_all()
+
+# Handle the player
 
 def handle_status(player, status):
     play.handler_block_by_func(handle_play_activate)
@@ -47,13 +58,7 @@ pl.connect('status-changed', handle_status)
 pl.connect('track-changed', handle_track)
 pl.connect('playtime', handle_playtime)
 
-window = builder.get_object('main-window')
-
-def handle_window_destroy(window):
-    loop.quit()
-
-window.connect('destroy', handle_window_destroy)
-window.show_all()
+# Start everything up
 
 loop = GObject.MainLoop()
 loop.run()
