@@ -59,6 +59,11 @@ box.pack_end(embed)
 """
 
 window = builder.get_object('main-window')
+
+def handle_window_destroy(window):
+    loop.quit()
+
+window.connect('destroy', handle_window_destroy)
 window.show_all()
 
 loop = gobject.MainLoop()
