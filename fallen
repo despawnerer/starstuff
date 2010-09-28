@@ -25,15 +25,15 @@ playtime = builder.get_object('playtime')
 play = builder.get_object('play')
 volume = builder.get_object('volume')
 
-def handle_play_toggled(play):
+def handle_play_activate(play):
     pl.play() if play.get_active() else pl.pause()
 
-play.connect('activate', handle_play_toggled)
+play.connect('activate', handle_play_activate)
 
 def handle_status(player, status):
-    play.handler_block_by_func(handle_play_toggled)
+    play.handler_block_by_func(handle_play_activate)
     play.set_active(status == 1) # if playing
-    play.handler_unblock_by_func(handle_play_toggled)
+    play.handler_unblock_by_func(handle_play_activate)
     tracklabel.set_sensitive(status != 0) # if not stopped
     if status == 0:
         tracklabel.set_text("Not playing")
