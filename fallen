@@ -1,0 +1,66 @@
+#!/usr/bin/python
+
+import sys
+import gobject
+import gtk
+"""
+import cluttergtk
+import clutter
+"""
+
+from Fallen.connections import Connections
+from Fallen.player import Player
+from Fallen import library
+
+pl = Player()
+
+cs = Connections()
+cs.bring_up()
+
+builder = gtk.Builder()
+builder.add_from_file('Fallen/ui/main.ui')
+
+tracklabel = builder.get_object('track-name')
+playtime = builder.get_object('playtime')
+play = builder.get_object('play')
+volume = builder.get_object('volume')
+
+def handle_play_toggled(play):
+    pl.play() if play.get_active() else pl.pause()
+
+play.connect('activate', handle_play_toggled)
+
+def handle_status(player, status):
+    play.handler_block_by_func(handle_play_toggled)
+    play.set_active(status == 1) # if playing
+    play.handler_unblock_by_func(handle_play_toggled)
+    tracklabel.set_sensitive(status != 0) # if not stopped
+    if status == 0:
+        tracklabel.set_text("Not playing")
+        playtime.set_value(0)
+
+def handle_track(player, track):
+    tracklabel.set_markup(('<b>%(title)s</b> by %(artist)s' % track.info).replace('&', '&amp;'))
+    playtime.set_upper(int(track.info['duration']))
+
+def handle_playtime(player, time):
+    playtime.set_value(int(time))
+
+pl.connect('status-changed', handle_status)
+pl.connect('track-changed', handle_track)
+pl.connect('playtime', handle_playtime)
+
+"""
+embed = cluttergtk.Embed()
+stage = embed.get_stage()
+
+box = builder.get_object('main-box')
+box.pack_end(embed)
+"""
+
+window = builder.get_object('main-window')
+window.show_all()
+
+loop = gobject.MainLoop()
+loop.run()
+
