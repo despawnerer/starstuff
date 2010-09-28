@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import sys
-import gobject
-import gtk
+
+from gi.repository import GObject
+from gi.repository import Gtk
 """
 import cluttergtk
 import clutter
@@ -17,7 +18,7 @@ pl = Player()
 cs = Connections()
 cs.bring_up()
 
-builder = gtk.Builder()
+builder = Gtk.Builder()
 builder.add_from_file('Fallen/ui/main.ui')
 
 tracklabel = builder.get_object('track-name')
@@ -40,7 +41,7 @@ def handle_status(player, status):
         playtime.set_value(0)
 
 def handle_track(player, track):
-    tracklabel.set_markup(('<b>%(title)s</b> by %(artist)s' % track.info).replace('&', '&amp;'))
+    tracklabel.set_markup(('<b>%(title)s</b> by %(artist)s' % track.info).replace('&', '&amp;').encode('utf-8'))
     playtime.set_upper(int(track.info['duration']))
 
 def handle_playtime(player, time):
@@ -66,6 +67,6 @@ def handle_window_destroy(window):
 window.connect('destroy', handle_window_destroy)
 window.show_all()
 
-loop = gobject.MainLoop()
+loop = GObject.MainLoop()
 loop.run()
 
