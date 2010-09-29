@@ -9,67 +9,89 @@ from Fallen.connections import Connections
 from Fallen.player import Player
 from Fallen import library
 
-pl = Player()
 
-cs = Connections()
-cs.bring_up()
+class Fallen:
 
-builder = Gtk.Builder()
-builder.add_from_file('Fallen/ui/main.ui')
+    """
+    Main Fallen application class
+    """
 
-# Handle the UI
+    def __init__(self):
 
-window = builder.get_object('main-window')
-tracklabel = builder.get_object('track-name')
-playtime = builder.get_object('playtime')
-play = builder.get_object('play')
-volume = builder.get_object('volume')
+        # load the ui
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file('Fallen/ui/main.ui')
 
-def handle_play_activate(play):
-    pl.play() if play.get_active() else pl.pause()
+        # set the window up
+        window = self.builder.get_object('main-window')
+        window.show_all()
+        window.connect('destroy', self._handle_window_destroy)
 
-play.connect('activate', handle_play_activate)
+        # player controls
+        self.play = self.builder.get_object('play')
+        self.play.connect('activate', self._handle_play)
+        self.next = self.builder.get_object('next')
+        self.next.connect('activate', lambda action: self.player.next());
+        self.prev = self.builder.get_object('previous')
+        self.prev.connect('activate', lambda action: self.player.prev());
 
-builder.get_object('next').connect('activate', lambda action: pl.next())
-builder.get_object('previous').connect('activate', lambda action: pl.prev())
+        # track title label and timeline controls
+        self.tracklabel = self.builder.get_object('track-name')
+        self.playtime = self.builder.get_object('playtime')
 
-def handle_window_destroy(window):
-    loop.quit()
+        # our cool classes to handle xmms
+        self.player = Player()
+        self.connections = Connections()
+        self.connections.bring_up()
 
-window.connect('destroy', handle_window_destroy)
-window.show_all()
+        # handle player events from xmms
+        self.player.connect('status-changed', self._handle_status_changed)
+        self.player.connect('track-changed', self._handle_track_changed)
+        self.player.connect('playtime', self._handle_playtime)
 
-# Handle the player
+        # use gobject mainloop
+        self.mainloop = GObject.MainLoop()
 
-def handle_status(player, status):
-    play.handler_block_by_func(handle_play_activate)
-    play.set_active(status == 1) # if playing
-    play.handler_unblock_by_func(handle_play_activate)
-    tracklabel.set_sensitive(status != 0) # if not stopped
-    if status == 0:
-        tracklabel.set_text("Not playing")
-        playtime.set_value(0)
+    # -------------------------------------------------------------------------
 
-def handle_track(player, track):
-    if track.info:
-        handle_track_metadata(track)
-    if pl.current:
-        pl.current.disconnect_by_func(handle_track_metadata)
-    track.connect('updated', handle_track_metadata)
+    def _handle_window_destroy(self, window):
+        self.mainloop.quit()
 
-def handle_track_metadata(track):
-    tracklabel.set_markup(('<b>%(title)s</b> by %(artist)s' % track.info).replace('&', '&amp;').encode('utf-8'))
-    playtime.set_upper(int(track.info['duration']))
+    def _handle_play(self, action):
+        self.player.play() if action.get_active() else self.player.pause()
 
-def handle_playtime(player, time):
-    playtime.set_value(int(time))
+    # -------------------------------------------------------------------------
 
-pl.connect('status-changed', handle_status)
-pl.connect('track-changed', handle_track)
-pl.connect('playtime', handle_playtime)
+    def _handle_status_changed(self, player, status):
+        self.play.handler_block_by_func(self._handle_play)
+        self.play.set_active(status == 1) # if playing
+        self.play.handler_unblock_by_func(self._handle_play)
+        self.tracklabel.set_sensitive(status != 0) # if not stopped
+        if status == 0:
+            self.tracklabel.set_text("Not playing")
+            self.playtime.set_value(0)
 
-# Start everything up
+    def _handle_playtime(self, player, time):
+        self.playtime.set_value(int(time))
 
-loop = GObject.MainLoop()
-loop.run()
+    def _handle_track_changed(self, player, track):
+        if track.info:
+            self._handle_current_track_metadata(track)
+        if self.player.current:
+            self.player.current.disconnect_by_func(
+                self._handle_current_track_metadata)
+        track.connect('updated', self._handle_current_track_metadata)
+
+    def _handle_current_track_metadata(self, track):
+        label = '<b>%(title)s</b> by %(artist)s' % track.info
+        self.tracklabel.set_markup(label.replace('&', '&amp;').encode('utf-8'))
+        self.playtime.set_upper(int(track.info['duration']))
+
+
+def main():
+	fallen = Fallen()
+	fallen.mainloop.run()
+
+if __name__ == "__main__":
+    main()
 
