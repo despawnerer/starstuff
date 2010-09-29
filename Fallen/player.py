@@ -93,3 +93,9 @@ class Player(gobject.GObject):
         if self.status == xmmsclient.PLAYBACK_STATUS_STOP:
             self.play()
 
+    def next(self):
+        self.jump_rel(1)
+
+    def prev(self):
+        self.jump_rel(-1)
+
