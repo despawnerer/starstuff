@@ -164,12 +164,12 @@ class Track(Collectable):
 
     id = 0
     info = TrackInfo()
-    
+
     __gsignals__ = {
         'updated': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [])
     }
     
-    def __new__(cls, id, callback=None):
+    def __new__(cls, id):
         lib = Library()
         if id not in lib.tracks:
             obj = gobject.GObject.__new__(cls) # temporary strong ref
@@ -177,12 +177,10 @@ class Track(Collectable):
             lib.request_info(id)
         return lib.tracks[id]
         
-    def __init__(self, id, callback=None):
+    def __init__(self, id):
         Collectable.__init__(self)
         self.id = id
-        if callback:
-            self.connect('updated', callback)
-        
+
     def __repr__(self):
         return "<Track #%d>" % self.id
 
