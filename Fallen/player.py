@@ -60,19 +60,18 @@ class Player(gobject.GObject):
             return
         if not status:
             self.current = None
-        self.status = status
         self.emit('status-changed', status)
+        self.status = status
 
     @result_handler
     def _handle_current_id(self, id):
+        track = library.Track(id)
+        self.emit('track-changed', track)
         if self.current:
             if self.current.id == id:
                 return
             self.current = None
-        self.current = library.Track(id, self._handle_current_info)
-
-    def _handle_current_info(self, track):
-        self.emit('track-changed', track)
+        self.current = track
 
     # ------------------------------------------------------------------
 
