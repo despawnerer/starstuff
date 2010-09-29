@@ -51,6 +51,13 @@ def handle_status(player, status):
         playtime.set_value(0)
 
 def handle_track(player, track):
+    if track.info:
+        handle_track_metadata(track)
+    if pl.current:
+        pl.current.disconnect_by_func(handle_track_metadata)
+    track.connect('updated', handle_track_metadata)
+
+def handle_track_metadata(track):
     tracklabel.set_markup(('<b>%(title)s</b> by %(artist)s' % track.info).replace('&', '&amp;').encode('utf-8'))
     playtime.set_upper(int(track.info['duration']))
 
