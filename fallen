@@ -46,7 +46,7 @@ class Fallen:
 
         # handle player events from xmms
         self.player.connect('status-change', self._handle_status_changed)
-        self.player.connect('track-changed', self._handle_track_changed)
+        self.player.connect('track-change', self._handle_track_changed)
         self.player.connect('playtime', self._handle_playtime)
 
         # use gobject mainloop

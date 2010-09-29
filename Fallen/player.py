@@ -10,7 +10,7 @@ class Player(gobject.GObject):
 
     __gsignals__ = {
         'status-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
-        'track-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
+        'track-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
         'playlist-loaded': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
         'playtime': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
     }
@@ -66,7 +66,7 @@ class Player(gobject.GObject):
     @result_handler
     def _handle_current_id(self, id):
         track = library.Track(id)
-        self.emit('track-changed', track)
+        self.emit('track-change', track)
         if self.current:
             if self.current.id == id:
                 return
