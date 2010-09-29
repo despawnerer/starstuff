@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import gobject
+import xmmsclient
 from Fallen import library
 from Fallen.connections import Connections, connection_property, result_handler
 
@@ -83,4 +84,12 @@ class Player(gobject.GObject):
 
     def stop(self):
         self.server.playback_stop()
+
+    def jump_rel(self, delta):
+        if self.status == xmmsclient.PLAYBACK_STATUS_PAUSE:
+            self.play()
+        self.server.playlist_set_next_rel(delta)
+        self.server.playback_tickle()
+        if self.status == xmmsclient.PLAYBACK_STATUS_STOP:
+            self.play()
 
