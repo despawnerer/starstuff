@@ -30,6 +30,9 @@ def handle_play_activate(play):
 
 play.connect('activate', handle_play_activate)
 
+builder.get_object('next').connect('activate', lambda action: pl.next())
+builder.get_object('previous').connect('activate', lambda action: pl.prev())
+
 def handle_window_destroy(window):
     loop.quit()
 
