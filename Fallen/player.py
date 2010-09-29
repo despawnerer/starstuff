@@ -9,7 +9,7 @@ from Fallen.connections import Connections, connection_property, result_handler
 class Player(gobject.GObject):
 
     __gsignals__ = {
-        'status-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
+        'status-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
         'track-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
         'playlist-loaded': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
         'playtime': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
@@ -60,7 +60,7 @@ class Player(gobject.GObject):
             return
         if not status:
             self.current = None
-        self.emit('status-changed', status)
+        self.emit('status-change', status)
         self.status = status
 
     @result_handler
