@@ -8,15 +8,25 @@ class Playlist(gobject.GObject):
 
     __gsignals__ = {
         'entries-list': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
+        'position-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
     }
 
     server = connection_property('player')
+    entries = []
+    position = 0
+
+    def __new__(cls, name):
+        lib = library.Library()
+        if name not in lib.playlists:
+            obj = gobject.GObject.__new__(cls) # temporary strong ref
+            obj.server.playlist_list_entries(name, obj._handle_list_entries)
+            obj.server.playlist_current_pos(name, obj._handle_current_pos)
+            lib.playlists[name] = obj
+        return lib.playlists[name]
 
     def __init__(self, name):
         gobject.GObject.__init__(self)
         self.name = name
-        self.entries = []
-        self.server.playlist_list_entries(name, self._handle_list_entries)
 
     @result_handler
     def _handle_list_entries(self, entries):
@@ -24,4 +34,13 @@ class Playlist(gobject.GObject):
         for id in entries:
             self.entries.append(library.Track(id))
         self.emit('entries-list')
+
+    @result_handler
+    def _handle_current_pos(self, data):
+        position = data['position']
+        self._change_position(position)
+
+    def _change_position(self, position):
+        self.emit('position-change', position)
+        self.position = position
 

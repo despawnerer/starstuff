@@ -11,7 +11,8 @@ class Library(object):
     instance = None
     server = connection_property('library')
     tracks = WeakValueDictionary()
-    
+    playlists = WeakValueDictionary()
+
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
             cls.instance = object.__new__(cls, *args, **kwargs)
@@ -27,6 +28,7 @@ class Library(object):
         
     def __handle_connect(self, *args):
         self.server.broadcast_medialib_entry_changed(self.__handle_entry_changed)
+        self.server.broadcast_playlist_current_pos(self.__handle_playlist_pos)
         
     def __handle_disconnect(self, *args):
         pass
@@ -40,7 +42,14 @@ class Library(object):
         id = info['id']
         if id in self.tracks:
             self.tracks[id].update(info)
-        
+
+    @result_handler
+    def __handle_playlist_pos(self, data):
+        name = data['name']
+        position = data['position']
+        if name in self.playlists:
+            self.playlists[name]._change_position(position)
+
     def request_info(self, id):
         self.server.medialib_get_info(id, self.__handle_info)
 
