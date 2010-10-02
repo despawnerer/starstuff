@@ -45,8 +45,8 @@ class Fallen:
         self.connections.bring_up()
 
         # handle player events from xmms
-        self.player.connect('status-change', self._handle_status_changed)
-        self.player.connect('track-change', self._handle_track_changed)
+        self.player.connect('status-change', self._handle_status_change)
+        self.player.connect('track-change', self._handle_track_change)
         self.player.connect('playtime', self._handle_playtime)
 
         # use gobject mainloop
@@ -62,7 +62,7 @@ class Fallen:
 
     # -------------------------------------------------------------------------
 
-    def _handle_status_changed(self, player, status):
+    def _handle_status_change(self, player, status):
         self.play.handler_block_by_func(self._handle_play)
         self.play.set_active(status == 1) # if playing
         self.play.handler_unblock_by_func(self._handle_play)
@@ -74,7 +74,7 @@ class Fallen:
     def _handle_playtime(self, player, time):
         self.playtime.set_value(int(time))
 
-    def _handle_track_changed(self, player, track):
+    def _handle_track_change(self, player, track):
         if track.info:
             self._handle_current_track_metadata(track)
         if self.player.current:
