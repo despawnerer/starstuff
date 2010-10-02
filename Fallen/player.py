@@ -20,7 +20,7 @@ class Player(gobject.GObject):
 
     current = None
     status = None
-    current_playlist = None
+    playlist = None
 
     server = connection_property('player')
 
@@ -81,7 +81,7 @@ class Player(gobject.GObject):
     def _handle_playlist_loaded(self, name):
         playlist = Playlist(name)
         self.emit('playlist-change', playlist)
-        self.current_playlist = playlist
+        self.playlist = playlist
 
     # ------------------------------------------------------------------
 
