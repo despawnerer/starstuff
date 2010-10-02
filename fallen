@@ -61,10 +61,10 @@ class Fallen:
     def _handle_window_destroy(self, window):
         self.mainloop.quit()
 
+    # Current track UI --------------------------------------------------------
+
     def _handle_play(self, action):
         self.player.play() if action.get_active() else self.player.pause()
-
-    # -------------------------------------------------------------------------
 
     def _handle_status_change(self, player, status):
         self.play.handler_block_by_func(self._handle_play)
@@ -90,6 +90,8 @@ class Fallen:
         label = '<b>%(title)s</b> by %(artist)s' % track.info
         self.tracklabel.set_markup(label.replace('&', '&amp;').encode('utf-8'))
         self.playtime.set_upper(int(track.info['duration']))
+
+    # Playlist UI -------------------------------------------------------------
 
     def _handle_playlist_change(self, player, playlist):
         playlist.connect('entries-list', self._handle_playlist_entries_list)
