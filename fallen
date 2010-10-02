@@ -40,6 +40,8 @@ class Fallen:
         self.playtime = self.builder.get_object('playtime')
 
         # playlist
+        self.playliststatus = self.builder.get_object('playlist-status')
+        self.playlistview = self.builder.get_object('playlist-view')
         self.playlist = self.builder.get_object('playlist')
 
         # our cool classes to handle xmms
@@ -71,6 +73,13 @@ class Fallen:
         self.play.set_active(status == 1) # if playing
         self.play.handler_unblock_by_func(self._handle_play)
         self.tracklabel.set_sensitive(status != 0) # if not stopped
+        stocks = {
+            0: 'gtk-media-stop',
+            1: 'gtk-media-play',
+            2: 'gtk-media-pause'
+        }
+        self.playliststatus.set_property('stock-id', stocks[status])
+        self.playlistview.queue_draw() # FIXME: I don't like this
         if status == 0:
             self.tracklabel.set_text("Not playing")
             self.playtime.set_value(0)
@@ -101,7 +110,8 @@ class Fallen:
     def _handle_playlist_entries_list(self, playlist):
         self.playlist.clear()
         for index, track in enumerate(playlist.entries):
-            row = self.playlist.append([400, None, None, None, None, None])
+            row = self.playlist.append([False, None, None, None, None, None,
+                                        None])
             if track.info:
                 self._handle_playlist_track_metadata(track, row)
             track.connect('updated', self._handle_playlist_track_metadata, row)
@@ -109,14 +119,16 @@ class Fallen:
     def _handle_playlist_track_metadata(self, track, row):
         for index, key in enumerate(('title', 'artist', 'date', 'genre',
                                      'publisher')):
-            self.playlist.set_value(row, index + 1,
+            self.playlist.set_value(row, index + 2,
                                     track.info[key].encode('utf-8'))
 
     def _handle_playlist_position_change(self, playlist, position):
         res, row = self.playlist.get_iter_from_string(str(playlist.position))
-        self.playlist.set_value(row, 0, 400) # 400 is the normal font weight
+        self.playlist.set_value(row, 0, False)
+        self.playlist.set_value(row, 1, 400) # 400 is the normal font weight
         res, row = self.playlist.get_iter_from_string(str(position))
-        self.playlist.set_value(row, 0, 600) # 600 is bold
+        self.playlist.set_value(row, 0, True)
+        self.playlist.set_value(row, 1, 600) # 600 is bold
 
 
 def main():
