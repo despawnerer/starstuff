@@ -90,8 +90,8 @@ class Fallen:
     def _handle_track_change(self, player, track):
         if track.info:
             self._handle_current_track_metadata(track)
-        if self.player.current:
-            self.player.current.disconnect_by_func(
+        if self.player.track:
+            self.player.track.disconnect_by_func(
                 self._handle_current_track_metadata)
         track.connect('updated', self._handle_current_track_metadata)
 

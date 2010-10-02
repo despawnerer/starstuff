@@ -17,12 +17,11 @@ class Player(gobject.GObject):
     }
 
     instance = None
-
-    current = None
-    status = None
-    playlist = None
-
     server = connection_property('player')
+
+    status = None
+    track = None
+    playlist = None
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
@@ -63,7 +62,7 @@ class Player(gobject.GObject):
         if status == self.status:
             return
         if not status:
-            self.current = None
+            self.track = None
         self.emit('status-change', status)
         self.status = status
 
@@ -71,11 +70,11 @@ class Player(gobject.GObject):
     def _handle_current_id(self, id):
         track = library.Track(id)
         self.emit('track-change', track)
-        if self.current:
-            if self.current.id == id:
+        if self.track:
+            if self.track.id == id:
                 return
-            self.current = None
-        self.current = track
+            self.track = None
+        self.track = track
 
     @result_handler
     def _handle_playlist_loaded(self, name):
