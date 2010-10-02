@@ -3,6 +3,7 @@
 import gobject
 import xmmsclient
 from Fallen import library
+from Fallen.playlist import Playlist
 from Fallen.connections import Connections, connection_property, result_handler
 
 
@@ -11,6 +12,7 @@ class Player(gobject.GObject):
     __gsignals__ = {
         'status-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
         'track-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
+        'playlist-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
         'playtime': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
     }
 
@@ -18,6 +20,7 @@ class Player(gobject.GObject):
 
     current = None
     status = None
+    current_playlist = None
 
     server = connection_property('player')
 
@@ -40,9 +43,11 @@ class Player(gobject.GObject):
         self.server.playback_current_id(self._handle_current_id)
         self.server.playback_status(self._handle_status)
         self.server.playback_playtime(self._handle_playtime)
+        self.server.playlist_current_active(self._handle_playlist_loaded)
         self.server.broadcast_playback_current_id(self._handle_current_id)
         self.server.broadcast_playback_status(self._handle_status)
         self.server.signal_playback_playtime(self._handle_playtime)
+        self.server.broadcast_playlist_loaded(self._handle_playlist_loaded)
 
     def _handle_disconnected(self, manager):
         pass
@@ -71,6 +76,12 @@ class Player(gobject.GObject):
                 return
             self.current = None
         self.current = track
+
+    @result_handler
+    def _handle_playlist_loaded(self, name):
+        playlist = Playlist(name)
+        self.emit('playlist-change', playlist)
+        self.current_playlist = playlist
 
     # ------------------------------------------------------------------
 
