@@ -95,12 +95,13 @@ class Fallen:
 
     def _handle_playlist_change(self, player, playlist):
         playlist.connect('entries-list', self._handle_playlist_entries_list)
+        playlist.connect('position-change',
+                         self._handle_playlist_position_change)
 
     def _handle_playlist_entries_list(self, playlist):
         self.playlist.clear()
         for index, track in enumerate(playlist.entries):
-            row = self.playlist.append([None, None, None, None, None, None])
-            self.playlist.set_value(row, 0, index + 1)
+            row = self.playlist.append([400, None, None, None, None, None])
             if track.info:
                 self._handle_playlist_track_metadata(track, row)
             track.connect('updated', self._handle_playlist_track_metadata, row)
@@ -110,6 +111,13 @@ class Fallen:
                                      'publisher')):
             self.playlist.set_value(row, index + 1,
                                     track.info[key].encode('utf-8'))
+
+    def _handle_playlist_position_change(self, playlist, position):
+        res, row = self.playlist.get_iter_from_string(str(playlist.position))
+        self.playlist.set_value(row, 0, 400) # 400 is the normal font weight
+        res, row = self.playlist.get_iter_from_string(str(position))
+        self.playlist.set_value(row, 0, 600) # 600 is bold
+
 
 def main():
 	fallen = Fallen()
