@@ -119,6 +119,7 @@ class Fallen:
     def _handle_playlist_track_metadata(self, track, row):
         for index, key in enumerate(('title', 'artist', 'date', 'genre',
                                      'publisher')):
+            # metadata starts from the third row
             self.playlist.set_value(row, index + 2,
                                     track.info[key].encode('utf-8'))
 
