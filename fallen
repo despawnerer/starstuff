@@ -39,6 +39,9 @@ class Fallen:
         self.tracklabel = self.builder.get_object('track-name')
         self.playtime = self.builder.get_object('playtime')
 
+        # playlist
+        self.playlist = self.builder.get_object('playlist')
+
         # our cool classes to handle xmms
         self.player = Player()
         self.connections = Connections()
@@ -47,6 +50,7 @@ class Fallen:
         # handle player events from xmms
         self.player.connect('status-change', self._handle_status_change)
         self.player.connect('track-change', self._handle_track_change)
+        self.player.connect('playlist-change', self._handle_playlist_change)
         self.player.connect('playtime', self._handle_playtime)
 
         # use gobject mainloop
@@ -87,6 +91,23 @@ class Fallen:
         self.tracklabel.set_markup(label.replace('&', '&amp;').encode('utf-8'))
         self.playtime.set_upper(int(track.info['duration']))
 
+    def _handle_playlist_change(self, player, playlist):
+        playlist.connect('entries-list', self._handle_playlist_entries_list)
+
+    def _handle_playlist_entries_list(self, playlist):
+        self.playlist.clear()
+        for index, track in enumerate(playlist.entries):
+            row = self.playlist.append([None, None, None, None, None, None])
+            self.playlist.set_value(row, 0, index + 1)
+            if track.info:
+                self._handle_playlist_track_metadata(track, row)
+            track.connect('updated', self._handle_playlist_track_metadata, row)
+
+    def _handle_playlist_track_metadata(self, track, row):
+        for index, key in enumerate(('title', 'artist', 'date', 'genre',
+                                     'publisher')):
+            self.playlist.set_value(row, index + 1,
+                                    track.info[key].encode('utf-8'))
 
 def main():
 	fallen = Fallen()
