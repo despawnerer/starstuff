@@ -29,6 +29,7 @@ class Library(object):
     def __handle_connect(self, *args):
         self.server.broadcast_medialib_entry_changed(self.__handle_entry_changed)
         self.server.broadcast_playlist_current_pos(self.__handle_playlist_pos)
+        self.server.broadcast_playlist_changed(self.__handle_playlist_changed)
         
     def __handle_disconnect(self, *args):
         pass
@@ -49,6 +50,12 @@ class Library(object):
         position = data['position']
         if name in self.playlists:
             self.playlists[name]._change_position(position)
+
+    @result_handler
+    def __handle_playlist_changed(self, data):
+        name = data['name']
+        if name in self.playlists:
+            self.playlists[name]._change(data)
 
     def request_info(self, id):
         self.server.medialib_get_info(id, self.__handle_info)
