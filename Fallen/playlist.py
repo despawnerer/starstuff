@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import gobject
+import xmmsclient
 from Fallen import library
 from Fallen.connections import connection_property, result_handler
 
@@ -9,6 +10,7 @@ class Playlist(gobject.GObject):
     __gsignals__ = {
         'entries-list': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
         'position-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
+        'clear': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
     }
 
     server = connection_property('player')
@@ -43,4 +45,12 @@ class Playlist(gobject.GObject):
     def _change_position(self, position):
         self.emit('position-change', position)
         self.position = position
+
+    def _change(self, data):
+        assert data['name'] == self.name
+        action = data['type']
+        if action == xmmsclient.PLAYLIST_CHANGED_CLEAR:
+            self.emit('clear')
+            del self.entries[:]
+            return
 
