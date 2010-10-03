@@ -106,6 +106,8 @@ class Fallen:
         playlist.connect('entries-list', self._handle_playlist_entries_list)
         playlist.connect('position-change',
                          self._handle_playlist_position_change)
+        playlist.connect('clear', self._handle_playlist_clear)
+        playlist.connect('entry-remove', self._handle_playlist_entry_remove)
 
     def _handle_playlist_entries_list(self, playlist):
         self.playlist.clear()
@@ -130,6 +132,13 @@ class Fallen:
         res, row = self.playlist.get_iter_from_string(str(position))
         self.playlist.set_value(row, 0, True)
         self.playlist.set_value(row, 1, 600) # 600 is bold
+
+    def _handle_playlist_clear(self, playlist):
+        self.playlist.clear()
+
+    def _handle_playlist_entry_remove(self, playlist, position):
+        res, row = self.playlist.get_iter_from_string(str(position))
+        self.playlist.remove(row)
 
 
 def main():
