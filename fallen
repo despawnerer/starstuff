@@ -109,6 +109,7 @@ class Fallen:
         playlist.connect('clear', self._handle_playlist_clear)
         playlist.connect('entry-remove', self._handle_playlist_entry_remove)
         playlist.connect('entry-insert', self._handle_playlist_entry_insert)
+        playlist.connect('entry-move', self._handle_playlist_entry_move)
 
     def _handle_playlist_entries_list(self, playlist):
         self.playlist.clear()
@@ -151,6 +152,13 @@ class Fallen:
             self._handle_playlist_track_metadata(track, row)
         track.connect('updated', self._handle_playlist_track_metadata, row)
 
+    def _handle_playlist_entry_move(self, playlist, position, newposition):
+        valid, row = self.playlist.get_iter_from_string(str(position))
+        valid, newrow = self.playlist.get_iter_from_string(str(newposition))
+        if position < newposition:
+            self.playlist.move_after(row, newrow)
+        else:
+            self.playlist.move_before(row, newrow)
 
 def main():
 	fallen = Fallen()
