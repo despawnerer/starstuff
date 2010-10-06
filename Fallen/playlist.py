@@ -12,6 +12,8 @@ class Playlist(gobject.GObject):
         'position-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
         'clear': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
         'entry-remove': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
+        'entry-insert': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                         [gobject.TYPE_PYOBJECT, gobject.TYPE_INT]),
     }
 
     server = connection_property('player')
@@ -58,4 +60,11 @@ class Playlist(gobject.GObject):
             position = data['position']
             self.emit('entry-remove', position)
             del self.entries[position]
+        elif action in [xmmsclient.PLAYLIST_CHANGED_INSERT,
+                        xmmsclient.PLAYLIST_CHANGED_ADD]:
+            position = data['position']
+            id = data['id']
+            track = library.Track(id)
+            self.emit('entry-insert', track, position)
+            self.entries.insert(position, track)
 
