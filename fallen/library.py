@@ -208,25 +208,23 @@ class TrackInfo(dict):
 
 class Track(Collectable):
 
-    id = 0
-    info = None
-
     __gsignals__ = {
         'update': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
                    [GObject.TYPE_PYOBJECT]),
     }
 
     def __new__(cls, id):
-        lib = Library()
-        if id not in lib.tracks:
-            obj = GObject.GObject.__new__(cls) # temporary strong ref
-            lib.tracks[id] = obj
-            lib.request_info(id)
-        return lib.tracks[id]
+        library = Library()
+        if id not in library.tracks:
+            track = GObject.GObject.__new__(cls) # temporary strong ref
+            track.id = id
+            track.info = None
+            library.tracks[id] = track
+            library.request_info(id)
+        return library.tracks[id]
 
     def __init__(self, id):
         Collectable.__init__(self)
-        self.id = id
 
     def __repr__(self):
         return "<Track #%d>" % self.id
