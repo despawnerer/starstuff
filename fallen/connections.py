@@ -21,14 +21,14 @@ def connection_property(name):
 class Connections(GObject.GObject):
 
     __gsignals__ = {
-        'connected': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
-        'disconnected': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])
+        'connect': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
+        'disconnect': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [])
     }
 
     instance = None
+
     up = False
     connections = dict()
-
     path = None
 
     def __new__(cls, *args, **kwargs):
@@ -43,27 +43,35 @@ class Connections(GObject.GObject):
             self.__connect(handle)
         return self.connections[handle]
 
+    # -------------------------------------------------------------------------
+
     def __connect(self, handle):
         c = Connection()
         c.connect(self.path)
         self.connections[handle] = c
 
-    def __disconnect(self, handle):
-        c = self.connections[handle]
-        c.disconnect()
-        self.connections[handle] = None        
-
     def bring_up(self):
+        self.emit('connect')
+
+    def do_connect(self):
         for handle in self.connections:
             self.__connect(handle)
         self.up = True
-        self.emit('connected')
+
+    # -------------------------------------------------------------------------
+
+    def __disconnect(self, handle):
+        c = self.connections[handle]
+        c.disconnect()
+        self.connections[handle] = None
 
     def bring_down(self):
+        self.emit('disconnect')
+
+    def do_disconnect(self):
         for handle in self.connections:
             self.__disconnect(handle)
         self.up = False
-        self.emit('disconnected')
 
 
 class Connection(XMMS):

@@ -37,13 +37,13 @@ class Player(GObject.GObject):
         self.status = None
         self.track = None
         self.playlist = None
-        manager = Connections()
-        manager.connect('connected', self.__handle_connected)
-        manager.connect('disconnected', self.__handle_disconnected)
-        if self.server:
-            self.__handle_connected(manager)
+        connections = Connections()
+        connections.connect_after('connect', self.__handle_connect)
+        connections.connect_after('disconnect', self.__handle_disconnect)
+        if connections.up:
+            self.__handle_connect()
 
-    def __handle_connected(self, manager):
+    def __handle_connect(self, *args):
         self.server.playback_current_id(self.__handle_current_id)
         self.server.playback_status(self.__handle_status)
         self.server.playback_playtime(self.__handle_playtime)
@@ -53,7 +53,7 @@ class Player(GObject.GObject):
         self.server.signal_playback_playtime(self.__handle_playtime)
         self.server.broadcast_playlist_loaded(self.__handle_playlist_loaded)
 
-    def __handle_disconnected(self, manager):
+    def __handle_disconnect(self, *args):
         pass
 
     # -------------------------------------------------------------------------

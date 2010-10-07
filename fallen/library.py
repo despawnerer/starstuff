@@ -24,9 +24,9 @@ class Library(object):
         
     def setup(self):
         connections = Connections()
-        connections.connect('connected', self.__handle_connect)
-        connections.connect('disconnected', self.__handle_disconnect)
-        if self.server:
+        connections.connect_after('connect', self.__handle_connect)
+        connections.connect_after('disconnect', self.__handle_disconnect)
+        if connections.up:
             self.__handle_connect()
 
     def __handle_connect(self, *args):
