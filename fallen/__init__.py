@@ -1,13 +1,11 @@
-#!/usr/bin/python
-
 import sys
 
 from gi.repository import GObject
 from gi.repository import Gtk
 
-from Fallen.connections import Connections
-from Fallen.player import Player
-from Fallen import library
+from fallen.connections import Connections
+from fallen.player import Player
+from fallen import library
 
 
 class Fallen:

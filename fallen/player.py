@@ -2,9 +2,9 @@
 
 import gobject
 import xmmsclient
-from Fallen import library
-from Fallen.playlist import Playlist
-from Fallen.connections import Connections, connection_property, result_handler
+from fallen import library
+from fallen.playlist import Playlist
+from fallen.connections import Connections, connection_property, result_handler
 
 
 class Player(gobject.GObject):

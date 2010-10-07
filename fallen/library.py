@@ -3,7 +3,7 @@
 import gobject
 from xmmsclient import collections
 from weakref import WeakValueDictionary
-from Fallen.connections import Connections, connection_property, result_handler
+from fallen.connections import Connections, connection_property, result_handler
 
 
 class Library(object):
