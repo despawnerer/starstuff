@@ -1,0 +1,10 @@
+#!/usr/bin/python
+
+import sys
+import fallen
+
+try:
+    sys.exit(fallen.main())
+except (KeyboardInterrupt, SystemExit):
+    pass
+
