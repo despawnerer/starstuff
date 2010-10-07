@@ -148,14 +148,14 @@ class Fallen:
     def _handle_playlist_track_metadata(self, track, info, row):
         for index, key in enumerate(('title', 'artist', 'date', 'genre',
                                      'publisher')):
-            # metadata starts from the third row
+            # metadata starts from the third column
             self.playlist.set_value(row, index + 2,
                                     info[key].encode('utf-8'))
 
     def _handle_playlist_position_change(self, playlist, position):
         valid, row = self.playlist.get_iter_from_string(str(playlist.position))
         if valid:
-            self.playlist.set_value(row, 0, False) # "nowplaying" row
+            self.playlist.set_value(row, 0, False) # "nowplaying" column
             self.playlist.set_value(row, 1, 400) # normal font weight
         valid, row = self.playlist.get_iter_from_string(str(position))
         if valid:
