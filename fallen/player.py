@@ -38,32 +38,32 @@ class Player(GObject.GObject):
         self.track = None
         self.playlist = None
         manager = Connections()
-        manager.connect('connected', self._handle_connected)
-        manager.connect('disconnected', self._handle_disconnected)
+        manager.connect('connected', self.__handle_connected)
+        manager.connect('disconnected', self.__handle_disconnected)
         if self.server:
-            self._handle_connected(manager)
+            self.__handle_connected(manager)
 
-    def _handle_connected(self, manager):
-        self.server.playback_current_id(self._handle_current_id)
-        self.server.playback_status(self._handle_status)
-        self.server.playback_playtime(self._handle_playtime)
-        self.server.playlist_current_active(self._handle_playlist_loaded)
-        self.server.broadcast_playback_current_id(self._handle_current_id)
-        self.server.broadcast_playback_status(self._handle_status)
-        self.server.signal_playback_playtime(self._handle_playtime)
-        self.server.broadcast_playlist_loaded(self._handle_playlist_loaded)
+    def __handle_connected(self, manager):
+        self.server.playback_current_id(self.__handle_current_id)
+        self.server.playback_status(self.__handle_status)
+        self.server.playback_playtime(self.__handle_playtime)
+        self.server.playlist_current_active(self.__handle_playlist_loaded)
+        self.server.broadcast_playback_current_id(self.__handle_current_id)
+        self.server.broadcast_playback_status(self.__handle_status)
+        self.server.signal_playback_playtime(self.__handle_playtime)
+        self.server.broadcast_playlist_loaded(self.__handle_playlist_loaded)
 
-    def _handle_disconnected(self, manager):
+    def __handle_disconnected(self, manager):
         pass
 
     # -------------------------------------------------------------------------
 
     @result_handler
-    def _handle_playtime(self, time):
+    def __handle_playtime(self, time):
         self.emit('playtime', time)
 
     @result_handler
-    def _handle_status(self, status):
+    def __handle_status(self, status):
         if status == self.status:
             return
         self.emit('status-change', status)
@@ -74,7 +74,7 @@ class Player(GObject.GObject):
         self.status = status
 
     @result_handler
-    def _handle_current_id(self, id):
+    def __handle_current_id(self, id):
         track = library.Track(id)
         self.emit('track-change', track)
 
@@ -86,7 +86,7 @@ class Player(GObject.GObject):
         self.track = track
 
     @result_handler
-    def _handle_playlist_loaded(self, name):
+    def __handle_playlist_loaded(self, name):
         playlist = Playlist(name)
         self.emit('playlist-change', playlist)
 
