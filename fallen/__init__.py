@@ -91,16 +91,16 @@ class Fallen:
 
     def _handle_track_change(self, player, track):
         if track.info:
-            self._handle_current_track_metadata(track)
+            self._handle_current_track_metadata(track, track.info)
         if self.player.track:
             self.player.track.disconnect_by_func(
                 self._handle_current_track_metadata)
-        track.connect('updated', self._handle_current_track_metadata)
+        track.connect('update', self._handle_current_track_metadata)
 
-    def _handle_current_track_metadata(self, track):
-        label = '<b>%(title)s</b> by %(artist)s' % track.info
+    def _handle_current_track_metadata(self, track, info):
+        label = '<b>%(title)s</b> by %(artist)s' % info
         self.tracklabel.set_markup(label.replace('&', '&amp;').encode('utf-8'))
-        self.playtime.set_upper(int(track.info['duration']))
+        self.playtime.set_upper(int(info['duration']))
 
     # Playlist UI -------------------------------------------------------------
 
@@ -123,15 +123,16 @@ class Fallen:
             row = self.playlist.append([False, None, None, None, None, None,
                                         None])
             if track.info:
-                self._handle_playlist_track_metadata(track, row)
-            track.connect('updated', self._handle_playlist_track_metadata, row)
+                self._handle_playlist_track_metadata(track, track.info, row)
+            track.connect('update',
+                          self._handle_playlist_track_metadata, row)
 
-    def _handle_playlist_track_metadata(self, track, row):
+    def _handle_playlist_track_metadata(self, track, info, row):
         for index, key in enumerate(('title', 'artist', 'date', 'genre',
                                      'publisher')):
             # metadata starts from the third row
             self.playlist.set_value(row, index + 2,
-                                    track.info[key].encode('utf-8'))
+                                    info[key].encode('utf-8'))
 
     def _handle_playlist_position_change(self, playlist, position):
         valid, row = self.playlist.get_iter_from_string(str(playlist.position))
@@ -157,8 +158,8 @@ class Fallen:
         else:
             row = self.playlist.append([False, None, None, None, None, None, None])
         if track.info:
-            self._handle_playlist_track_metadata(track, row)
-        track.connect('updated', self._handle_playlist_track_metadata, row)
+            self._handle_playlist_track_metadata(track, track.info, row)
+        track.connect('update', self._handle_playlist_track_metadata, row)
 
     def _handle_playlist_entry_move(self, playlist, position, newposition):
         valid, row = self.playlist.get_iter_from_string(str(position))
