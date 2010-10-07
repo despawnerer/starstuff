@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import gobject
 import xmmsclient
+from gi.repository import GObject
+
 from fallen import library
 from fallen.playlist import Playlist
 from fallen.connections import Connections, connection_property, result_handler
 
 
-class Player(gobject.GObject):
+class Player(GObject.GObject):
 
     __gsignals__ = {
-        'status-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
-        'track-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
-        'playlist-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT]),
-        'playtime': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
+        'status-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_INT]),
+        'track-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_PYOBJECT]),
+        'playlist-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_PYOBJECT]),
+        'playtime': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_INT]),
     }
 
     instance = None
@@ -25,7 +26,7 @@ class Player(gobject.GObject):
 
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
-            cls.instance = gobject.GObject.__new__(cls, *args, **kwargs)
+            cls.instance = GObject.GObject.__new__(cls, *args, **kwargs)
             cls.instance.setup()
         return cls.instance
 
