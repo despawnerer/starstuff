@@ -3,7 +3,7 @@
 import xmmsclient
 from gi.repository import GObject
 
-from fallen import library
+from fallen.library import Library, Track
 from fallen.connections import connection_property, result_handler
 
 
@@ -23,21 +23,24 @@ class Playlist(GObject.GObject):
     }
 
     server = connection_property('player')
-    entries = []
-    position = 0
 
     def __new__(cls, name):
-        lib = library.Library()
-        if name not in lib.playlists:
-            obj = GObject.GObject.__new__(cls) # temporary strong ref
-            obj.server.playlist_list_entries(name, obj.__handle_list_entries)
-            obj.server.playlist_current_pos(name, obj.__handle_current_pos)
-            lib.playlists[name] = obj
-        return lib.playlists[name]
+        library = Library()
+        if name not in library.playlists:
+            playlist = GObject.GObject.__new__(cls) # temporary strong ref
+            playlist.setup(name)
+            library.playlists[name] = playlist
+        return library.playlists[name]
 
     def __init__(self, name):
         GObject.GObject.__init__(self)
+
+    def setup(self, name):
         self.name = name
+        self.entries = []
+        self.position = 0
+        self.server.playlist_list_entries(name, self.__handle_list_entries)
+        self.server.playlist_current_pos(name, self.__handle_current_pos)
 
     # -------------------------------------------------------------------------
 
@@ -45,7 +48,7 @@ class Playlist(GObject.GObject):
     def __handle_list_entries(self, entries):
         del self.entries[:]
         for id in entries:
-            self.entries.append(library.Track(id))
+            self.entries.append(Track(id))
         self.emit('entries-list')
 
     # -------------------------------------------------------------------------
@@ -72,7 +75,7 @@ class Playlist(GObject.GObject):
                         xmmsclient.PLAYLIST_CHANGED_ADD]:
             position = data['position']
             id = data['id']
-            track = library.Track(id)
+            track = Track(id)
             self.emit('entry-insert', track, position)
         elif action == xmmsclient.PLAYLIST_CHANGED_MOVE:
             position = data['position']
