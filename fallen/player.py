@@ -24,10 +24,6 @@ class Player(GObject.GObject):
     instance = None
     server = connection_property('player')
 
-    status = None
-    track = None
-    playlist = None
-
     def __new__(cls, *args, **kwargs):
         if cls.instance is None:
             cls.instance = GObject.GObject.__new__(cls, *args, **kwargs)
@@ -37,6 +33,10 @@ class Player(GObject.GObject):
     # -------------------------------------------------------------------------
 
     def setup(self):
+        # set initial values
+        self.status = None
+        self.track = None
+        self.playlist = None
         manager = Connections()
         manager.connect('connected', self._handle_connected)
         manager.connect('disconnected', self._handle_disconnected)
