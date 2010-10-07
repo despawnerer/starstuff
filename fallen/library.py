@@ -196,9 +196,9 @@ class Item(Collectable):
 
 class TrackInfo(dict):
 
-    def __init__(self, info=None):
+    def __init__(self, info):
         dict.__init__(self)
-        # work around xmms' asshattery
+        # sanitize the info xmms2 gives us
         for group, key in info:
             self[key] = info[key]
 
