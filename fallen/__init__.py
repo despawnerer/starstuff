@@ -1,4 +1,5 @@
 import sys
+import os
 
 from gi.repository import GObject
 from gi.repository import Gtk
@@ -17,8 +18,9 @@ class Fallen:
     def __init__(self):
 
         # load the ui
+        uidir = os.path.join(__path__[0], 'ui')
         self.builder = Gtk.Builder()
-        self.builder.add_from_file('Fallen/ui/main.ui')
+        self.builder.add_from_file(os.path.join(uidir, 'main.ui'))
 
         # set the window up
         window = self.builder.get_object('main-window')
