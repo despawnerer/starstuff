@@ -134,12 +134,14 @@ class Fallen:
                                     track.info[key].encode('utf-8'))
 
     def _handle_playlist_position_change(self, playlist, position):
-        res, row = self.playlist.get_iter_from_string(str(playlist.position))
-        self.playlist.set_value(row, 0, False)
-        self.playlist.set_value(row, 1, 400) # 400 is the normal font weight
-        res, row = self.playlist.get_iter_from_string(str(position))
-        self.playlist.set_value(row, 0, True)
-        self.playlist.set_value(row, 1, 600) # 600 is bold
+        valid, row = self.playlist.get_iter_from_string(str(playlist.position))
+        if valid:
+            self.playlist.set_value(row, 0, False) # "nowplaying" row
+            self.playlist.set_value(row, 1, 400) # normal font weight
+        valid, row = self.playlist.get_iter_from_string(str(position))
+        if valid:
+            self.playlist.set_value(row, 0, True)
+            self.playlist.set_value(row, 1, 600) # bold
 
     def _handle_playlist_clear(self, playlist):
         self.playlist.clear()
