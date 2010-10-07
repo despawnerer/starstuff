@@ -12,6 +12,7 @@ class Library(object):
     
     instance = None
     server = connection_property('library')
+
     tracks = WeakValueDictionary()
     playlists = WeakValueDictionary()
 
@@ -27,19 +28,21 @@ class Library(object):
         connections.connect('disconnected', self.__handle_disconnect)
         if self.server:
             self.__handle_connect()
-        
+
     def __handle_connect(self, *args):
         self.server.broadcast_medialib_entry_changed(self.__handle_entry_changed)
         self.server.broadcast_playlist_current_pos(self.__handle_playlist_pos)
         self.server.broadcast_playlist_changed(self.__handle_playlist_changed)
-        
+
     def __handle_disconnect(self, *args):
         pass
-        
+
+    # -------------------------------------------------------------------------
+
     @result_handler
     def __handle_entry_changed(self, id):
         self.request_info(id)
-    
+
     @result_handler
     def __handle_info(self, info):
         info = TrackInfo(info)
@@ -48,6 +51,8 @@ class Library(object):
             track = self.tracks[id]
             if track.info != info:
                 track.emit('update', info)
+
+    # -------------------------------------------------------------------------
 
     @result_handler
     def __handle_playlist_pos(self, data):
@@ -62,11 +67,14 @@ class Library(object):
         if name in self.playlists:
             self.playlists[name]._change(data)
 
+    # -------------------------------------------------------------------------
+
     def request_info(self, id):
         self.server.medialib_get_info(id, self.__handle_info)
 
 
-# ---------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class Collectable(GObject.GObject):
 
@@ -85,8 +93,8 @@ class Collectable(GObject.GObject):
 
     def get_collection(self):
         raise NotImplemented
-        
-    
+
+
 class CollectableGroup(Collectable):
 
     def __init__(self, items=None):
@@ -130,6 +138,9 @@ class CollectableGroup(Collectable):
         return collection
 
 
+# -----------------------------------------------------------------------------
+
+
 class Item(Collectable):
 
     __gsignals__ = {
@@ -138,21 +149,25 @@ class Item(Collectable):
     }
 
     server = connection_property('library')
-    
+
     def __init__(self, **keys):
         GObject.GObject.__init__(self)
         self.keys = keys
-        
+
     def __repr__(self):
         pairs = [ '%s="%s"' % (key, self.keys[key]) for key in self.keys ]
         desc = unicode(' && '.join(pairs)).encode('utf-8') # fuck yeah
         return "<Item %s>" % desc
 
+    # -------------------------------------------------------------------------
+
     @result_handler
     def _handle_fill(self, infos):
         items = CollectableGroup([self.item(**info) for info in infos])
         self.emit('filled', items)
-        
+
+    # -------------------------------------------------------------------------
+
     def item(self, **keys):
         if 'id' not in keys:
             item = Item(**self.keys)
@@ -160,7 +175,7 @@ class Item(Collectable):
             return item
         else:
             return Track(keys['id'])
-            
+
     def get_collection(self):
         collection = collections.Universe()
         for key in self.keys:
@@ -170,10 +185,13 @@ class Item(Collectable):
             else:    # handle the "unknown" case
                 collection = collections.Complement(collections.Has(collection, field=key))
         return collection
-        
+
     def fill(self, *fields):
         collection = self.get_collection()
         self.server.coll_query_infos(collection, list(fields), 0, 0, [], [], self._handle_fill)
+
+
+# -----------------------------------------------------------------------------
 
 
 class TrackInfo(dict):
@@ -213,8 +231,12 @@ class Track(Collectable):
     def __repr__(self):
         return "<Track #%d>" % self.id
 
+    # -------------------------------------------------------------------------
+
     def do_update(self, info):
         self.info = info
+
+    # -------------------------------------------------------------------------
 
     def get_collection(self):
         return collections.Equals(collection, field="id", value=self.id)
