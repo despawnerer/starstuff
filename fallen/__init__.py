@@ -23,9 +23,9 @@ class Fallen:
         self.builder.add_from_file(os.path.join(uidir, 'main.ui'))
 
         # set the window up
-        window = self.builder.get_object('main-window')
-        window.show_all()
-        window.connect('destroy', self._handle_window_destroy)
+        self.window = self.builder.get_object('main-window')
+        self.window.show_all()
+        self.window.connect('destroy', self._handle_window_destroy)
 
         # player controls
         self.play = self.builder.get_object('play')
@@ -56,6 +56,8 @@ class Fallen:
         self.player.connect('track-change', self._handle_track_change)
         self.player.connect('playlist-change', self._handle_playlist_change)
         self.player.connect('playtime', self._handle_playtime)
+        self.player.connect_after('status-change', self._update_window_title)
+        self.player.connect_after('track-change', self._update_window_title)
 
         # use gobject mainloop
         self.mainloop = GObject.MainLoop()
@@ -64,6 +66,17 @@ class Fallen:
 
     def _handle_window_destroy(self, window):
         self.mainloop.quit()
+
+    def _update_window_title(self, *args):
+        status = self.player.status
+        track = self.player.track
+        if status and track and track.info:
+            title = "%(artist)s \xe2\x80\x94 %(title)s".decode('utf-8') % track.info
+            if status == 2:
+                title += " (paused)"
+        else:
+            title = "Fallen"
+        self.window.set_title(title.encode('utf-8'))
 
     # Current track UI --------------------------------------------------------
 
@@ -95,7 +108,9 @@ class Fallen:
         if self.player.track:
             self.player.track.disconnect_by_func(
                 self._handle_current_track_metadata)
+            self.player.track.disconnect_by_func(self._update_window_title)
         track.connect('update', self._handle_current_track_metadata)
+        track.connect_after('update', self._update_window_title)
 
     def _handle_current_track_metadata(self, track, info):
         label = '<b>%(title)s</b> by %(artist)s' % info
