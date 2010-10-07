@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import gobject
 import xmmsclient
+from gi.repository import GObject
+
 from fallen import library
 from fallen.connections import connection_property, result_handler
 
-class Playlist(gobject.GObject):
+class Playlist(GObject.GObject):
 
     __gsignals__ = {
-        'entries-list': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
-        'position-change': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
-        'clear': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, []),
-        'entry-remove': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_INT]),
-        'entry-insert': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                         [gobject.TYPE_PYOBJECT, gobject.TYPE_INT]),
-        'entry-move': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                       [gobject.TYPE_INT, gobject.TYPE_INT]),
+        'entries-list': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, []),
+        'position-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                            [GObject.TYPE_INT]),
+        'clear': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
+        'entry-remove': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_INT]),
+        'entry-insert': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                         [GObject.TYPE_PYOBJECT, GObject.TYPE_INT]),
+        'entry-move': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                       [GObject.TYPE_INT, GObject.TYPE_INT]),
     }
 
     server = connection_property('player')
@@ -25,14 +27,14 @@ class Playlist(gobject.GObject):
     def __new__(cls, name):
         lib = library.Library()
         if name not in lib.playlists:
-            obj = gobject.GObject.__new__(cls) # temporary strong ref
+            obj = GObject.GObject.__new__(cls) # temporary strong ref
             obj.server.playlist_list_entries(name, obj._handle_list_entries)
             obj.server.playlist_current_pos(name, obj._handle_current_pos)
             lib.playlists[name] = obj
         return lib.playlists[name]
 
     def __init__(self, name):
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self.name = name
 
     @result_handler
@@ -49,6 +51,8 @@ class Playlist(gobject.GObject):
 
     def _change_position(self, position):
         self.emit('position-change', position)
+
+    def do_position_change(self, position):
         self.position = position
 
     def _change(self, data):
@@ -56,23 +60,30 @@ class Playlist(gobject.GObject):
         action = data['type']
         if action == xmmsclient.PLAYLIST_CHANGED_CLEAR:
             self.emit('clear')
-            del self.entries[:]
-            return
         elif action == xmmsclient.PLAYLIST_CHANGED_REMOVE:
             position = data['position']
             self.emit('entry-remove', position)
-            del self.entries[position]
         elif action in [xmmsclient.PLAYLIST_CHANGED_INSERT,
                         xmmsclient.PLAYLIST_CHANGED_ADD]:
             position = data['position']
             id = data['id']
             track = library.Track(id)
             self.emit('entry-insert', track, position)
-            self.entries.insert(position, track)
         elif action == xmmsclient.PLAYLIST_CHANGED_MOVE:
             position = data['position']
             newposition = data['newposition']
             self.emit('entry-move', position, newposition)
-            track = self.entries.pop(position)
-            self.entries.insert(newposition, track)
+
+    def do_clear(self):
+        del self.entries[:]
+
+    def do_entry_remove(self, position):
+        del self.entries[position]
+
+    def do_entry_insert(self, track, position):
+        self.entries.insert(position, track)
+
+    def do_entry_move(self, position, newposition):
+        track = self.entries.pop(position)
+        self.entries.insert(newposition, track)
 
