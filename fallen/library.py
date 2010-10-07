@@ -239,6 +239,3 @@ class Track(Collectable):
     def get_collection(self):
         return collections.Equals(collection, field="id", value=self.id)
 
-    def get_artwork(self, place='front'):
-        return
-
