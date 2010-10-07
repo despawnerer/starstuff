@@ -42,9 +42,12 @@ class Library(object):
     
     @result_handler
     def __handle_info(self, info):
+        info = TrackInfo(info)
         id = info['id']
         if id in self.tracks:
-            self.tracks[id].update(info)
+            track = self.tracks[id]
+            if track.info != info:
+                track.emit('update', info)
 
     @result_handler
     def __handle_playlist_pos(self, data):
@@ -175,19 +178,26 @@ class Item(Collectable):
 
 class TrackInfo(dict):
 
+    def __init__(self, info=None):
+        dict.__init__(self)
+        # work around xmms' asshattery
+        for group, key in info:
+            self[key] = info[key]
+
     def __getitem__(self, item): 
         return self.has_key(item) and dict.__getitem__(self, item) or "n/a"
-        
-        
+
+
 class Track(Collectable):
 
     id = 0
-    info = TrackInfo()
+    info = None
 
     __gsignals__ = {
-        'updated': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])
+        'update': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                   [GObject.TYPE_PYOBJECT]),
     }
-    
+
     def __new__(cls, id):
         lib = Library()
         if id not in lib.tracks:
@@ -195,7 +205,7 @@ class Track(Collectable):
             lib.tracks[id] = obj
             lib.request_info(id)
         return lib.tracks[id]
-        
+
     def __init__(self, id):
         Collectable.__init__(self)
         self.id = id
@@ -203,17 +213,12 @@ class Track(Collectable):
     def __repr__(self):
         return "<Track #%d>" % self.id
 
+    def do_update(self, info):
+        self.info = info
+
     def get_collection(self):
         return collections.Equals(collection, field="id", value=self.id)
 
     def get_artwork(self, place='front'):
         return
-        
-    def update(self, info):
-        newinfo = TrackInfo()
-        for group, key in info:
-            newinfo[key] = info[key] # work around xmms' asshattery
-        if newinfo != self.info:
-            self.info = newinfo
-            self.emit('updated')
 
