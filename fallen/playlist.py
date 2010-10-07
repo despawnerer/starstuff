@@ -40,7 +40,7 @@ class Playlist(GObject.GObject):
     # -------------------------------------------------------------------------
 
     @result_handler
-    def _handle_list_entries(self, entries):
+    def __handle_list_entries(self, entries):
         del self.entries[:]
         for id in entries:
             self.entries.append(library.Track(id))
@@ -49,7 +49,7 @@ class Playlist(GObject.GObject):
     # -------------------------------------------------------------------------
 
     @result_handler
-    def _handle_current_pos(self, data):
+    def __handle_current_pos(self, data):
         position = data['position']
         self.emit('position-change', position)
 
