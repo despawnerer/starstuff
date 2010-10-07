@@ -40,28 +40,28 @@ class Connections(GObject.GObject):
         if not self.up:
             return None
         if not handle in self.connections:
-            self._connect(handle)
+            self.__connect(handle)
         return self.connections[handle]
         
-    def _connect(self, handle):
+    def __connect(self, handle):
         c = Connection()
         c.connect(self.path)
         self.connections[handle] = c
         
-    def _disconnect(self, handle):
+    def __disconnect(self, handle):
         c = self.connections[handle]
         c.disconnect()
         self.connections[handle] = None        
        
     def bring_up(self):
         for handle in self.connections:
-            self._connect(handle)
+            self.__connect(handle)
         self.up = True
         self.emit('connected')
             
     def bring_down(self):
         for handle in self.connections:
-            self._disconnect(handle)
+            self.__disconnect(handle)
         self.up = False
         self.emit('disconnected')
         
