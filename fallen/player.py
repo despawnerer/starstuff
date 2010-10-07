@@ -11,10 +11,14 @@ from fallen.connections import Connections, connection_property, result_handler
 class Player(GObject.GObject):
 
     __gsignals__ = {
-        'status-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_INT]),
-        'track-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_PYOBJECT]),
-        'playlist-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_PYOBJECT]),
-        'playtime': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [GObject.TYPE_INT]),
+        'status-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                          [GObject.TYPE_INT]),
+        'track-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                         [GObject.TYPE_PYOBJECT]),
+        'playlist-change': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                            [GObject.TYPE_PYOBJECT]),
+        'playtime': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                     [GObject.TYPE_INT]),
     }
 
     instance = None
@@ -30,7 +34,7 @@ class Player(GObject.GObject):
             cls.instance.setup()
         return cls.instance
 
-    # ------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def setup(self):
         manager = Connections()
@@ -52,7 +56,7 @@ class Player(GObject.GObject):
     def _handle_disconnected(self, manager):
         pass
 
-    # ------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     @result_handler
     def _handle_playtime(self, time):
@@ -83,7 +87,7 @@ class Player(GObject.GObject):
         self.emit('playlist-change', playlist)
         self.playlist = playlist
 
-    # ------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def play(self):
         self.server.playback_start()
