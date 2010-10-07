@@ -6,6 +6,7 @@ from gi.repository import GObject
 from fallen import library
 from fallen.connections import connection_property, result_handler
 
+
 class Playlist(GObject.GObject):
 
     __gsignals__ = {
