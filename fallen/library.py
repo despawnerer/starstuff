@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import gobject
-from xmmsclient import collections
 from weakref import WeakValueDictionary
+
+from xmmsclient import collections
+from gi.repository import GObject
+
 from fallen.connections import Connections, connection_property, result_handler
 
 
@@ -63,7 +65,7 @@ class Library(object):
 
 # ---------------------------------------------
 
-class Collectable(gobject.GObject):
+class Collectable(GObject.GObject):
 
     def __add__(self, y):
         if isinstance(y, Item):
@@ -128,13 +130,14 @@ class CollectableGroup(Collectable):
 class Item(Collectable):
 
     __gsignals__ = {
-        'filled': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [gobject.TYPE_PYOBJECT])
+        'filled': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                   [GObject.TYPE_PYOBJECT])
     }
 
     server = connection_property('library')
     
     def __init__(self, **keys):
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self.keys = keys
         
     def __repr__(self):
@@ -182,13 +185,13 @@ class Track(Collectable):
     info = TrackInfo()
 
     __gsignals__ = {
-        'updated': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, [])
+        'updated': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, [])
     }
     
     def __new__(cls, id):
         lib = Library()
         if id not in lib.tracks:
-            obj = gobject.GObject.__new__(cls) # temporary strong ref
+            obj = GObject.GObject.__new__(cls) # temporary strong ref
             lib.tracks[id] = obj
             lib.request_info(id)
         return lib.tracks[id]
