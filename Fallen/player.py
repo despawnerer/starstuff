@@ -93,6 +93,14 @@ class Player(gobject.GObject):
     def stop(self):
         self.server.playback_stop()
 
+    def jump(self, position):
+        if self.status == xmmsclient.PLAYBACK_STATUS_PAUSE:
+            self.play()
+        self.server.playlist_set_next(position)
+        self.server.playback_tickle()
+        if self.status == xmmsclient.PLAYBACK_STATUS_STOP:
+            self.play()
+
     def jump_rel(self, delta):
         if self.status == xmmsclient.PLAYBACK_STATUS_PAUSE:
             self.play()

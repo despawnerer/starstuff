@@ -42,6 +42,8 @@ class Fallen:
         # playlist
         self.playliststatus = self.builder.get_object('playlist-status')
         self.playlistview = self.builder.get_object('playlist-view')
+        self.playlistview.connect('row-activated',
+                                  self._handle_playlistview_row_activated)
         self.playlist = self.builder.get_object('playlist')
 
         # our cool classes to handle xmms
@@ -101,6 +103,10 @@ class Fallen:
         self.playtime.set_upper(int(track.info['duration']))
 
     # Playlist UI -------------------------------------------------------------
+
+    def _handle_playlistview_row_activated(self, view, path, column):
+        position = int(path.to_string()) # FIXME: not good, should use indices
+        self.player.jump(position)
 
     def _handle_playlist_change(self, player, playlist):
         playlist.connect('entries-list', self._handle_playlist_entries_list)
