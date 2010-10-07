@@ -37,12 +37,16 @@ class Playlist(GObject.GObject):
         GObject.GObject.__init__(self)
         self.name = name
 
+    # -------------------------------------------------------------------------
+
     @result_handler
     def _handle_list_entries(self, entries):
         del self.entries[:]
         for id in entries:
             self.entries.append(library.Track(id))
         self.emit('entries-list')
+
+    # -------------------------------------------------------------------------
 
     @result_handler
     def _handle_current_pos(self, data):
@@ -54,6 +58,8 @@ class Playlist(GObject.GObject):
 
     def do_position_change(self, position):
         self.position = position
+
+    # -------------------------------------------------------------------------
 
     def _change(self, data):
         assert data['name'] == self.name
