@@ -30,8 +30,8 @@ class Playlist(GObject.GObject):
         lib = library.Library()
         if name not in lib.playlists:
             obj = GObject.GObject.__new__(cls) # temporary strong ref
-            obj.server.playlist_list_entries(name, obj._handle_list_entries)
-            obj.server.playlist_current_pos(name, obj._handle_current_pos)
+            obj.server.playlist_list_entries(name, obj.__handle_list_entries)
+            obj.server.playlist_current_pos(name, obj.__handle_current_pos)
             lib.playlists[name] = obj
         return lib.playlists[name]
 
