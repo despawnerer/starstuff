@@ -203,7 +203,7 @@ class TrackInfo(dict):
             self[key] = info[key]
 
     def __getitem__(self, item): 
-        return self.has_key(item) and dict.__getitem__(self, item) or "n/a"
+        return dict.__getitem__(self, item) if self.has_key(item) else "n/a"
 
 
 class Track(Collectable):
