@@ -49,7 +49,7 @@ class Library(object):
         name = data['name']
         position = data['position']
         if name in self.playlists:
-            self.playlists[name]._change_position(position)
+            self.playlists[name].emit('position-change', position)
 
     @result_handler
     def __handle_playlist_changed(self, data):

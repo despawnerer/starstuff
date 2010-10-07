@@ -51,9 +51,6 @@ class Playlist(GObject.GObject):
     @result_handler
     def _handle_current_pos(self, data):
         position = data['position']
-        self._change_position(position)
-
-    def _change_position(self, position):
         self.emit('position-change', position)
 
     def do_position_change(self, position):
