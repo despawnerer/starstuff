@@ -77,6 +77,8 @@ class Player(GObject.GObject):
     def _handle_current_id(self, id):
         track = library.Track(id)
         self.emit('track-change', track)
+
+    def do_track_change(self, track):
         if self.track:
             if self.track.id == id:
                 return
@@ -87,6 +89,8 @@ class Player(GObject.GObject):
     def _handle_playlist_loaded(self, name):
         playlist = Playlist(name)
         self.emit('playlist-change', playlist)
+
+    def do_playlist_change(self, playlist):
         self.playlist = playlist
 
     # -------------------------------------------------------------------------
