@@ -66,9 +66,11 @@ class Player(GObject.GObject):
     def _handle_status(self, status):
         if status == self.status:
             return
+        self.emit('status-change', status)
+
+    def do_status_change(self, status):
         if not status:
             self.track = None
-        self.emit('status-change', status)
         self.status = status
 
     @result_handler
