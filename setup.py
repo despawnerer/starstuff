@@ -4,13 +4,13 @@
 from distutils.core import setup
 
 setup(
-    name='Fallen',
-    version='0.0.2',
+    name='Starstuff',
+    version='0.0.1',
     author=u'Алексей Шельф',
     author_email='despawn@gmail.com',
     license='GPL',
-    packages=['fallen'],
-    package_data={'fallen': ['ui/*']},
-    scripts=['scripts/fallen'],
+    packages=['starstuff'],
+    package_data={'starstuff': ['ui/*']},
+    scripts=['scripts/starstuff'],
 )
 

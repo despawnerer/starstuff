@@ -3,8 +3,8 @@
 import xmmsclient
 from gi.repository import GObject
 
-from fallen.library import Library, Track
-from fallen.connections import connection_property, result_handler
+from starstuff.library import Library, Track
+from starstuff.connections import connection_property, result_handler
 
 
 class Playlist(GObject.GObject):

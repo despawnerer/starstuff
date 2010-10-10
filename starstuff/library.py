@@ -5,7 +5,7 @@ from weakref import WeakValueDictionary
 from xmmsclient import collections
 from gi.repository import GObject
 
-from fallen.connections import Connections, connection_property, result_handler
+from starstuff.connections import Connections, connection_property, result_handler
 
 
 class Library(object):

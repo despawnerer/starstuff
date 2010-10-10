@@ -7,15 +7,15 @@ import os
 from gi.repository import GObject
 from gi.repository import Gtk
 
-from fallen.connections import Connections
-from fallen.player import Player
-from fallen import library
+from starstuff.connections import Connections
+from starstuff.player import Player
+from starstuff import library
 
 
-class Fallen:
+class Starstuff:
 
     """
-    Main Fallen application class
+    Main Starstuff application class
     """
 
     def __init__(self):
@@ -78,7 +78,7 @@ class Fallen:
             if status == 2:
                 title += " (paused)"
         else:
-            title = "Fallen"
+            title = "Starstuff"
         self.window.set_title(title.encode('utf-8'))
 
     # Current track UI --------------------------------------------------------
@@ -188,8 +188,8 @@ class Fallen:
             self.playlist.move_before(row, newrow)
 
 def main():
-	fallen = Fallen()
-	fallen.mainloop.run()
+	starstuff = Starstuff()
+	starstuff.mainloop.run()
 
 if __name__ == "__main__":
     main()

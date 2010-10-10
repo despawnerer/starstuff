@@ -3,9 +3,9 @@
 import xmmsclient
 from gi.repository import GObject
 
-from fallen import library
-from fallen.playlist import Playlist
-from fallen.connections import Connections, connection_property, result_handler
+from starstuff import library
+from starstuff.playlist import Playlist
+from starstuff.connections import Connections, connection_property, result_handler
 
 
 class Player(GObject.GObject):
