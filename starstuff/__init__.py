@@ -153,12 +153,12 @@ class Starstuff:
                                     info[key].encode('utf-8'))
 
     def _handle_playlist_position_change(self, playlist, position):
-        valid, row = self.playlist.get_iter_from_string(str(playlist.position))
-        if valid:
+        row = self.playlist.get_iter_from_string(str(playlist.position))
+        if row:
             self.playlist.set_value(row, 0, False) # "nowplaying" column
             self.playlist.set_value(row, 1, 400) # normal font weight
-        valid, row = self.playlist.get_iter_from_string(str(position))
-        if valid:
+        row = self.playlist.get_iter_from_string(str(position))
+        if row:
             self.playlist.set_value(row, 0, True)
             self.playlist.set_value(row, 1, 600) # bold
 
@@ -166,22 +166,23 @@ class Starstuff:
         self.playlist.clear()
 
     def _handle_playlist_entry_remove(self, playlist, position):
-        res, row = self.playlist.get_iter_from_string(str(position))
-        self.playlist.remove(row)
+        row = self.playlist.get_iter_from_string(str(position))
+        if row:
+            self.playlist.remove(row)
 
     def _handle_playlist_entry_insert(self, playlist, track, position):
-        valid, row = self.playlist.get_iter_from_string(str(position))
-        if valid:
+        row = self.playlist.get_iter_from_string(str(position))
+        if row:
             row = self.playlist.insert_before(row)
         else:
-            row = self.playlist.append([False, None, None, None, None, None, None])
+            row = self.playlist.append()
         if track.info:
             self._handle_playlist_track_metadata(track, track.info, row)
         track.connect('update', self._handle_playlist_track_metadata, row)
 
     def _handle_playlist_entry_move(self, playlist, position, newposition):
-        valid, row = self.playlist.get_iter_from_string(str(position))
-        valid, newrow = self.playlist.get_iter_from_string(str(newposition))
+        row = self.playlist.get_iter_from_string(str(position))
+        newrow = self.playlist.get_iter_from_string(str(newposition))
         if position < newposition:
             self.playlist.move_after(row, newrow)
         else:
